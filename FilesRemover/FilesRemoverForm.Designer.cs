@@ -43,19 +43,17 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.borderDateLabel = new System.Windows.Forms.Label();
-            this.deleteDirectoriesCheckBox = new System.Windows.Forms.CheckBox();
+            this.deleteEmptyDirectoriesCheckBox = new System.Windows.Forms.CheckBox();
             this.deleteCopyFilesCheckBox = new System.Windows.Forms.CheckBox();
             this.overrideFilesCheckBox = new System.Windows.Forms.CheckBox();
             this.startTimeLabel = new System.Windows.Forms.Label();
             this.endTimeLabel = new System.Windows.Forms.Label();
             this.durationLabel = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.sourcePathDialog = new System.Windows.Forms.Button();
+            this.destinationPathDialog = new System.Windows.Forms.Button();
+            this.swapPathButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.paddingValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numberOfWeeks)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // startButton
@@ -64,7 +62,7 @@
             this.startButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.startButton.Location = new System.Drawing.Point(12, 24);
             this.startButton.Name = "startButton";
-            this.startButton.Size = new System.Drawing.Size(75, 52);
+            this.startButton.Size = new System.Drawing.Size(75, 56);
             this.startButton.TabIndex = 0;
             this.startButton.Text = "Start";
             this.startButton.UseVisualStyleBackColor = true;
@@ -213,17 +211,17 @@
             this.borderDateLabel.TabIndex = 17;
             this.borderDateLabel.Text = "borderDateLabel";
             // 
-            // deleteDirectoriesCheckBox
+            // deleteEmptyDirectoriesCheckBox
             // 
-            this.deleteDirectoriesCheckBox.AutoSize = true;
-            this.deleteDirectoriesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.deleteDirectoriesCheckBox.Location = new System.Drawing.Point(160, 107);
-            this.deleteDirectoriesCheckBox.Name = "deleteDirectoriesCheckBox";
-            this.deleteDirectoriesCheckBox.Size = new System.Drawing.Size(142, 20);
-            this.deleteDirectoriesCheckBox.TabIndex = 19;
-            this.deleteDirectoriesCheckBox.Text = "usuń puste katalogi";
-            this.deleteDirectoriesCheckBox.UseVisualStyleBackColor = true;
-            this.deleteDirectoriesCheckBox.CheckedChanged += new System.EventHandler(this.deleteDirectoriesCheckBox_CheckedChanged);
+            this.deleteEmptyDirectoriesCheckBox.AutoSize = true;
+            this.deleteEmptyDirectoriesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.deleteEmptyDirectoriesCheckBox.Location = new System.Drawing.Point(160, 107);
+            this.deleteEmptyDirectoriesCheckBox.Name = "deleteEmptyDirectoriesCheckBox";
+            this.deleteEmptyDirectoriesCheckBox.Size = new System.Drawing.Size(142, 20);
+            this.deleteEmptyDirectoriesCheckBox.TabIndex = 19;
+            this.deleteEmptyDirectoriesCheckBox.Text = "usuń puste katalogi";
+            this.deleteEmptyDirectoriesCheckBox.UseVisualStyleBackColor = true;
+            this.deleteEmptyDirectoriesCheckBox.CheckedChanged += new System.EventHandler(this.deleteEmptyDirectoriesCheckBox_CheckedChanged);
             // 
             // deleteCopyFilesCheckBox
             // 
@@ -283,63 +281,52 @@
             this.durationLabel.Text = "Czas trwania: ";
             this.durationLabel.Visible = false;
             // 
-            // pictureBox1
+            // sourcePathDialog
             // 
-            this.pictureBox1.Image = global::FilesRemover.Properties.Resources.cdpLogo;
-            this.pictureBox1.Location = new System.Drawing.Point(12, 95);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(142, 50);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 26;
-            this.pictureBox1.TabStop = false;
+            this.sourcePathDialog.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.sourcePathDialog.Location = new System.Drawing.Point(521, 26);
+            this.sourcePathDialog.Name = "sourcePathDialog";
+            this.sourcePathDialog.Size = new System.Drawing.Size(28, 22);
+            this.sourcePathDialog.TabIndex = 27;
+            this.sourcePathDialog.Text = "...";
+            this.sourcePathDialog.UseVisualStyleBackColor = true;
+            this.sourcePathDialog.Click += new System.EventHandler(this.sourcePathDialog_Click);
             // 
-            // button1
+            // destinationPathDialog
             // 
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button1.Location = new System.Drawing.Point(521, 24);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(28, 24);
-            this.button1.TabIndex = 27;
-            this.button1.Text = "...";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.destinationPathDialog.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.destinationPathDialog.Location = new System.Drawing.Point(1076, 26);
+            this.destinationPathDialog.Name = "destinationPathDialog";
+            this.destinationPathDialog.Size = new System.Drawing.Size(28, 22);
+            this.destinationPathDialog.TabIndex = 28;
+            this.destinationPathDialog.Text = "...";
+            this.destinationPathDialog.UseVisualStyleBackColor = true;
+            this.destinationPathDialog.Click += new System.EventHandler(this.destinationPathDialog_Click);
             // 
-            // button2
+            // swapPathButton
             // 
-            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button2.Location = new System.Drawing.Point(1076, 24);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(28, 24);
-            this.button2.TabIndex = 28;
-            this.button2.Text = "...";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(555, 16);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(37, 35);
-            this.button3.TabIndex = 29;
-            this.button3.Text = ">>";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.swapPathButton.Location = new System.Drawing.Point(555, 16);
+            this.swapPathButton.Name = "swapPathButton";
+            this.swapPathButton.Size = new System.Drawing.Size(37, 35);
+            this.swapPathButton.TabIndex = 29;
+            this.swapPathButton.Text = ">>";
+            this.swapPathButton.UseVisualStyleBackColor = true;
+            this.swapPathButton.Click += new System.EventHandler(this.swapPathButton_Click);
             // 
             // FilesRemoverForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1113, 662);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.swapPathButton);
+            this.Controls.Add(this.destinationPathDialog);
+            this.Controls.Add(this.sourcePathDialog);
             this.Controls.Add(this.durationLabel);
             this.Controls.Add(this.endTimeLabel);
             this.Controls.Add(this.startTimeLabel);
             this.Controls.Add(this.overrideFilesCheckBox);
             this.Controls.Add(this.deleteCopyFilesCheckBox);
-            this.Controls.Add(this.deleteDirectoriesCheckBox);
+            this.Controls.Add(this.deleteEmptyDirectoriesCheckBox);
             this.Controls.Add(this.borderDateLabel);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -362,9 +349,9 @@
             this.Name = "FilesRemoverForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Czyszczenie starych plików";
+            this.Load += new System.EventHandler(this.FilesRemoverForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.paddingValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numberOfWeeks)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -386,16 +373,15 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label borderDateLabel;
-        private System.Windows.Forms.CheckBox deleteDirectoriesCheckBox;
+        private System.Windows.Forms.CheckBox deleteEmptyDirectoriesCheckBox;
         private System.Windows.Forms.CheckBox deleteCopyFilesCheckBox;
         private System.Windows.Forms.CheckBox overrideFilesCheckBox;
         private System.Windows.Forms.Label startTimeLabel;
         private System.Windows.Forms.Label endTimeLabel;
         private System.Windows.Forms.Label durationLabel;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button sourcePathDialog;
+        private System.Windows.Forms.Button destinationPathDialog;
+        private System.Windows.Forms.Button swapPathButton;
     }
 }
 
