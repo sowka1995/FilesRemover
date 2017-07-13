@@ -1,52 +1,60 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
-using CodeProject;
 
 namespace FilesRemover
 {
     public partial class FilesRemoverForm : Form
     {
-        ILogger messageBoxLogger;
+        ILogger logger;
 
         private Stopwatch _stopwatch;
-
-        private int maxValueProgressBar;
-
-        private FilesRemoverModel filesRemoverModel;
-        private FilesRemover filesRemover;
+        private FilesRemoverModel _filesRemoverModel;
+        private FilesRemover _filesRemover;
 
         public FilesRemoverForm()
         {
             InitializeComponent();
 
             // Logi do MessageBox-a
-            messageBoxLogger = new MessageBoxLogger();
+            logger = new MessageBoxLogger();
 
-            filesRemoverModel = new FilesRemoverModel();
+            // Ustawiane wszystkie opcje
+            _filesRemoverModel = new FilesRemoverModel();
      
             // padding okienka wyświetlającego logi
             logBox.SelectionTabs = new[] {0, 800};
+        }
+
+        private void FilesRemoverForm_Load(object sender, EventArgs e)
+        {
+            // Bind textboxes - source and destination path
+            sourcePathTextBox.DataBindings.Add("Text", _filesRemoverModel, "SourcePath", true, DataSourceUpdateMode.OnPropertyChanged);
+            destinationPathTextBox.DataBindings.Add("Text", _filesRemoverModel, "DestinationPath", true, DataSourceUpdateMode.OnPropertyChanged);
+
+            // Bind checkbox - overrideFiles
+            overrideFilesCheckBox.DataBindings.Add("Checked", _filesRemoverModel, "OverrideFiles", true, DataSourceUpdateMode.OnPropertyChanged);
+
+            // Aktualizacja daty granicznej
+            UpdateBorderDate((int)numberOfWeeks.Value);
         }
 
         #region Events
 
         private void sourcePathDialog_Click(object sender, EventArgs e)
         {
-            filesRemoverModel.SourcePath = ShowFolderDialog(filesRemoverModel.SourcePath);
+            _filesRemoverModel.SourcePath = ShowFolderDialog(_filesRemoverModel.SourcePath);
         }
 
         private void destinationPathDialog_Click(object sender, EventArgs e)
         {
-            filesRemoverModel.DestinationPath = ShowFolderDialog(filesRemoverModel.DestinationPath);
+            _filesRemoverModel.DestinationPath = ShowFolderDialog(_filesRemoverModel.DestinationPath);
         }
 
         private void startButton_Click(object sender, EventArgs e)
         {
-            //czyszczenie pola z logiem operacji i aktualizacja daty granicznej
+            //czyszczenie pola z logiem operacji i blokowanie kontrolek
             ChangeEnableControls(false);
             logBox.ResetText();
 
@@ -54,21 +62,24 @@ namespace FilesRemover
 
             if (IsOptionsValid())
             {
-                filesRemover = new FilesRemover(filesRemoverModel, messageBoxLogger, logBox, progressBar, this);
+                _filesRemover = new FilesRemover(_filesRemoverModel, logger, logBox, progressBar);
 
                 UseWaitCursor = true;
                 Application.DoEvents();
 
                 StartTimer();
-                filesRemover.Start(() =>
+                _filesRemover.Start(() =>
                 {
                     StopTimer();
                     UseWaitCursor = false;
                     ChangeEnableControls(true);
+                    logger.Log("Zakończono!");
                 });
             }
             else
+            {
                 ChangeEnableControls(true);
+            }          
         }
 
         private void changePaddingButton_Click_1(object sender, EventArgs e)
@@ -90,35 +101,35 @@ namespace FilesRemover
 
         private void deleteCopyFilesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            filesRemoverModel.CopyAndDeleteFiles = (sender as CheckBox).Checked;
+            _filesRemoverModel.CopyAndDeleteFiles = (sender as CheckBox).Checked;
             AnyJobSelected();
         }
 
         private void deleteEmptyDirectoriesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            filesRemoverModel.DeleteEmptyDirectories = (sender as CheckBox).Checked;
+            _filesRemoverModel.DeleteEmptyDirectories = (sender as CheckBox).Checked;
             AnyJobSelected();
         }
-
-        private void FilesRemoverForm_Load(object sender, EventArgs e)
-        {
-            // Bind textboxes - source and destination path
-            sourcePathTextBox.DataBindings.Add("Text", filesRemoverModel, "SourcePath", true, DataSourceUpdateMode.OnPropertyChanged);
-            destinationPathTextBox.DataBindings.Add("Text", filesRemoverModel, "DestinationPath", true, DataSourceUpdateMode.OnPropertyChanged);
-
-            // Bind checkboxes
-            deleteCopyFilesCheckBox.DataBindings.Add("Checked", filesRemoverModel, "CopyAndDeleteFiles", true, DataSourceUpdateMode.OnPropertyChanged);
-            deleteEmptyDirectoriesCheckBox.DataBindings.Add("Checked", filesRemoverModel, "DeleteEmptyDirectories", true, DataSourceUpdateMode.OnPropertyChanged);
-            overrideFilesCheckBox.DataBindings.Add("Checked", filesRemoverModel, "OverrideFiles", true, DataSourceUpdateMode.OnPropertyChanged);
-
-            UpdateBorderDate((int)numberOfWeeks.Value);
-        }
-
+       
         private void swapPathButton_Click(object sender, EventArgs e)
         {
-            string tmp = filesRemoverModel.SourcePath;
-            filesRemoverModel.SourcePath = filesRemoverModel.DestinationPath;
-            filesRemoverModel.DestinationPath = tmp;
+            string tmp = _filesRemoverModel.SourcePath;
+            _filesRemoverModel.SourcePath = _filesRemoverModel.DestinationPath;
+            _filesRemoverModel.DestinationPath = tmp;
+        }
+
+        private void aboutProgram_Click(object sender, EventArgs e)
+        {
+            Form aboutForm = AboutProgram.GetInstance();
+
+            if (!aboutForm.Visible)
+            {
+                aboutForm.Show();
+            }
+            else
+            {
+                aboutForm.BringToFront();
+            }
         }
 
         #endregion
@@ -127,7 +138,7 @@ namespace FilesRemover
 
         private void AnyJobSelected()
         {
-            if (!filesRemoverModel.CopyAndDeleteFiles && !filesRemoverModel.DeleteEmptyDirectories)
+            if (!_filesRemoverModel.CopyAndDeleteFiles && !_filesRemoverModel.DeleteEmptyDirectories)
                 startButton.Enabled = false;
             else
                 startButton.Enabled = true;
@@ -147,33 +158,31 @@ namespace FilesRemover
         }
 
         private void InitializeProgressBar()
-        {
-            maxValueProgressBar = 1;
-
+        { 
             progressBar.Value = 0;
             progressBar.Step = 1;
-            progressBar.Maximum = maxValueProgressBar;
+            progressBar.Maximum = 1;
             progressBar.ForeColor = System.Drawing.Color.Yellow;
         }
 
         private bool IsOptionsValid()
         {
             //sprawdzanie poprawności scieżki początkowej i końcowej
-            if (!Directory.Exists(filesRemoverModel.SourcePath))
+            if (!Directory.Exists(_filesRemoverModel.SourcePath))
             {
-                messageBoxLogger.Log("Podana ścieżka początkowa nie istnieje!");    
+                logger.Log("Podana ścieżka początkowa nie istnieje!");    
                 return false;
             }
 
-            if (filesRemoverModel.CopyAndDeleteFiles && !Directory.Exists(filesRemoverModel.DestinationPath))
+            if (_filesRemoverModel.CopyAndDeleteFiles && !Directory.Exists(_filesRemoverModel.DestinationPath))
             {
-                messageBoxLogger.Log("Podana ścieżka końcowa nie istnieje!");
+                logger.Log("Podana ścieżka końcowa nie istnieje!");
                 return false;
             }
 
-            if (filesRemoverModel.CopyAndDeleteFiles && Path.GetFullPath(filesRemoverModel.SourcePath) == Path.GetFullPath(filesRemoverModel.DestinationPath))
+            if (_filesRemoverModel.CopyAndDeleteFiles && Path.GetFullPath(_filesRemoverModel.SourcePath) == Path.GetFullPath(_filesRemoverModel.DestinationPath))
             {
-                messageBoxLogger.Log("Ścieżka początkowa i końcowa nie może być taka sama!");
+                logger.Log("Ścieżka początkowa i końcowa nie może być taka sama!");
                 return false;
             }
 
@@ -226,12 +235,12 @@ namespace FilesRemover
         private void UpdateBorderDate(int numberOfWeeksBack)
         {
             int days = numberOfWeeksBack * 7;
-            filesRemoverModel.BorderDate = DateTime.Now;
-            filesRemoverModel.BorderDate = filesRemoverModel.BorderDate.Subtract(TimeSpan.FromDays(days));
+            _filesRemoverModel.BorderDate = DateTime.Now;
+            _filesRemoverModel.BorderDate = _filesRemoverModel.BorderDate.Subtract(TimeSpan.FromDays(days));
 
-            borderDateLabel.Text = filesRemoverModel.BorderDate.ToShortDateString();
+            borderDateLabel.Text = _filesRemoverModel.BorderDate.ToShortDateString();
         }
 
-        #endregion 
+        #endregion
     }
 }

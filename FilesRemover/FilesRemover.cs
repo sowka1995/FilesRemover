@@ -3,35 +3,34 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-
 
 namespace FilesRemover
 {
     internal class FilesRemover
     {
         private FilesRemoverModel filesRemoverModel;
-        private Form filesRemoverForm;
 
         private IEnumerable<FileData> allFiles;
-        private IEnumerable<string> allDirectories;
 
         private int allDirectoriesCount;
         private int allFilesCount;
         private int maxValueProgressBar;
+        private int deletedDirectoriesCount = 0;
+
+        private List<string> errorsDuringDeleteDirectories = new List<string>();
 
         ILogger logger;
         RichTextBox logBox;
         ProgressBar progressBar;
 
-        public FilesRemover(FilesRemoverModel filesRemoverModel, ILogger logger, RichTextBox logBox, ProgressBar progressBar, Form filesRemoverForm)
+        public FilesRemover(FilesRemoverModel filesRemoverModel, ILogger logger, RichTextBox logBox, ProgressBar progressBar)
         {
             this.filesRemoverModel = filesRemoverModel;
-            this.filesRemoverForm = filesRemoverForm;
             this.logger = logger;
             this.logBox = logBox;
             this.progressBar = progressBar;
+            allDirectoriesCount = -1;
         }
 
         public void Start(Action callback)
@@ -60,7 +59,7 @@ namespace FilesRemover
             if (allFiles != null)
                 CopyAndRemoveUnusedFiles();
 
-            if (allDirectories != null)
+            if (allDirectoriesCount != -1)
                 DeleteEmptyDirectories();
         }
 
@@ -83,8 +82,7 @@ namespace FilesRemover
         {
             try
             {
-                allDirectories = Directory.EnumerateDirectories(path, "*", SearchOption.AllDirectories);
-                allDirectoriesCount = allDirectories.Count();
+                allDirectoriesCount = Directory.EnumerateDirectories(path, "*", SearchOption.AllDirectories).Count();
                 maxValueProgressBar += allDirectoriesCount;
             }
             catch (Exception ex)
@@ -113,9 +111,11 @@ namespace FilesRemover
                     try
                     {
                         string copiedFilePath = $@"{filesRemoverModel.DestinationPath}\{fileName}";
+                        Label: 
                         if (File.Exists(copiedFilePath))
                         {
                             copiedFilePath = copiedFilePath.Insert(copiedFilePath.LastIndexOf('.'), "_copy");
+                            goto Label;
                         }
                         File.Copy(file.Path, copiedFilePath, filesRemoverModel.OverrideFiles);
                         File.SetLastAccessTime(copiedFilePath, lastAccessDate);
@@ -145,36 +145,42 @@ namespace FilesRemover
 
         private void DeleteEmptyDirectories()
         {
-            List<string> errors = new List<string>();
-            int count = 0;
-
             logBox.Invoke(new MethodInvoker(delegate
             {
-                logBox.AppendText($"Liczba wszystkich katalogów: {allDirectoriesCount} \n");
+                logBox.AppendText($"Liczba wszystkich katalogów: {allDirectoriesCount} \n \n");
+                logBox.AppendText($"Lista usuniętych katalogów: \n");
             }));
 
-            foreach (string directory in allDirectories)
+            DeleteDirectoriesRecursive(filesRemoverModel.SourcePath);
+
+            logBox.Invoke(new MethodInvoker(delegate { logBox.AppendText($"\nLiczba usuniętych katalogów: {deletedDirectoriesCount}"); }));
+
+            if (errorsDuringDeleteDirectories.Count != 0)
+                logBox.Invoke(new MethodInvoker(delegate { logBox.AppendText("\nBłędy: \n\n" + string.Join("\n", errorsDuringDeleteDirectories.ToArray())); }));
+        }
+
+        private void DeleteDirectoriesRecursive(string startLocation)
+        {
+            foreach (var directory in Directory.EnumerateDirectories(startLocation))
             {
+                DeleteDirectoriesRecursive(directory);
                 if (IsDirectoryEmpty(directory))
                 {
                     try
                     {
-                        Directory.Delete(directory);
+                        Directory.Delete(directory, false);
                         logBox.Invoke(new MethodInvoker(delegate { logBox.AppendText(directory + " \n"); }));
-                        count++;
+                        deletedDirectoriesCount++;
                     }
                     catch (Exception ex)
                     {
-                        errors.Add(ex.Message);
+                        errorsDuringDeleteDirectories.Add(ex.Message);
+                        return;
                     }
                 }
+
                 progressBar.Invoke(new MethodInvoker(delegate { progressBar.PerformStep(); }));
             }
-
-            logBox.Invoke(new MethodInvoker(delegate { logBox.AppendText($"\nLiczba usuniętych katalogów: {count}"); }));
-
-            if (errors.Count != 0)
-                logBox.Invoke(new MethodInvoker(delegate { logBox.AppendText("\nBłędy: \n\n" + string.Join("\n", errors.ToArray())); }));
         }
 
         private void CollectInfoForJobs()
@@ -182,7 +188,7 @@ namespace FilesRemover
             if (filesRemoverModel.CopyAndDeleteFiles)
                 CollectFilesInfo(filesRemoverModel.SourcePath);
             if (filesRemoverModel.DeleteEmptyDirectories)
-                CollectDirectoriesInfo(filesRemoverModel.SourcePath);
+                CollectDirectoriesInfo(filesRemoverModel.SourcePath); // tylko dla progres bara
         }
 
         private bool IsDirectoryEmpty(string path)

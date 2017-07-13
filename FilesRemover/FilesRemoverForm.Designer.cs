@@ -52,17 +52,20 @@
             this.sourcePathDialog = new System.Windows.Forms.Button();
             this.destinationPathDialog = new System.Windows.Forms.Button();
             this.swapPathButton = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.aboutProgram = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.paddingValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numberOfWeeks)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // startButton
             // 
             this.startButton.Enabled = false;
             this.startButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.startButton.Location = new System.Drawing.Point(12, 24);
+            this.startButton.Location = new System.Drawing.Point(12, 26);
             this.startButton.Name = "startButton";
-            this.startButton.Size = new System.Drawing.Size(75, 56);
+            this.startButton.Size = new System.Drawing.Size(75, 54);
             this.startButton.TabIndex = 0;
             this.startButton.Text = "Start";
             this.startButton.UseVisualStyleBackColor = true;
@@ -134,7 +137,7 @@
             this.paddingValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.paddingValue.Location = new System.Drawing.Point(997, 131);
             this.paddingValue.Maximum = new decimal(new int[] {
-            1200,
+            920,
             0,
             0,
             0});
@@ -305,13 +308,30 @@
             // 
             // swapPathButton
             // 
-            this.swapPathButton.Location = new System.Drawing.Point(555, 16);
+            this.swapPathButton.Location = new System.Drawing.Point(555, 26);
             this.swapPathButton.Name = "swapPathButton";
-            this.swapPathButton.Size = new System.Drawing.Size(37, 35);
+            this.swapPathButton.Size = new System.Drawing.Size(37, 22);
             this.swapPathButton.TabIndex = 29;
             this.swapPathButton.Text = ">>";
             this.swapPathButton.UseVisualStyleBackColor = true;
             this.swapPathButton.Click += new System.EventHandler(this.swapPathButton_Click);
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutProgram});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1113, 24);
+            this.menuStrip1.TabIndex = 30;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // aboutProgram
+            // 
+            this.aboutProgram.Name = "aboutProgram";
+            this.aboutProgram.Size = new System.Drawing.Size(86, 20);
+            this.aboutProgram.Text = "O programie";
+            this.aboutProgram.Click += new System.EventHandler(this.aboutProgram_Click);
             // 
             // FilesRemoverForm
             // 
@@ -341,7 +361,9 @@
             this.Controls.Add(this.sourcePathTextBox);
             this.Controls.Add(this.logBox);
             this.Controls.Add(this.startButton);
+            this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(1129, 701);
             this.MinimizeBox = false;
@@ -352,6 +374,8 @@
             this.Load += new System.EventHandler(this.FilesRemoverForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.paddingValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numberOfWeeks)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -382,6 +406,8 @@
         private System.Windows.Forms.Button sourcePathDialog;
         private System.Windows.Forms.Button destinationPathDialog;
         private System.Windows.Forms.Button swapPathButton;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem aboutProgram;
     }
 }
 
